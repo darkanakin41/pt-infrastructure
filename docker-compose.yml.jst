@@ -1,0 +1,88 @@
+if (JST === undefined) {
+  JST = {}
+}
+
+const jstResult = {
+  services: {
+    traefik: {
+      image: 'traefik:latest',
+      ports: ["80:80", "443:443"],
+      networks: ['default', 'reverse-proxy'],
+      labels: {
+        "traefik.enable": true,
+        "traefik.http.routers.traefik-dashboard-localhost.rule": "Host(`localhost`, `127.0.0.1`)",
+        "traefik.http.routers.traefik-dashboard-localhost.service": "api@internal",
+        "traefik.http.routers.traefik-dashboard-tls-localhost.rule": "Host(`localhost`, `127.0.0.1`)",
+        "traefik.http.routers.traefik-dashboard-tls-localhost.service": "api@internal",
+        "traefik.http.routers.traefik-dashboard-tls-localhost.tls": 'true',
+        "traefik.http.routers.traefik-secure.entrypoints": "https",
+        "traefik.http.routers.traefik-secure.rule": `Host(\`${JST.buildDomain('traefik')}\`)`,
+        "traefik.http.routers.traefik-secure.tls": "true",
+        "traefik.http.routers.traefik-secure.tls.certresolver": JST.getConfiguration('reverseProxy.certResolver'),
+        "traefik.http.routers.traefik-secure.tls.domains[0].main": `${JST.getConfiguration('reverseProxy.domain.sub')}.${JST.getConfiguration('reverseProxy.domain.ext')}`,
+        "traefik.http.routers.traefik-secure.tls.domains[0].sans": `*.${JST.getConfiguration('reverseProxy.domain.sub')}.${JST.getConfiguration('reverseProxy.domain.ext')}`,
+        "traefik.http.routers.traefik-secure.service": "api@internal",
+      },
+      environment: {
+        CF_API_EMAIL: JST.getConfiguration('project.cloudflare.email'),
+        CF_DNS_API_TOKEN: JST.getConfiguration('project.cloudflare.token'),
+      },
+      volumes: [
+        "/var/run/docker.sock:/var/run/docker.sock",
+        "./traefik/traefik.yaml:/traefik.yaml",
+        "./traefik/acme.json:/acme.json",
+        "./traefik/config:/config",
+        "./traefik/certs:/certs"
+      ]
+    },
+    watchtower: {
+      image: 'containrrr/watchtower',
+      volumes: [
+        "/var/run/docker.sock:/var/run/docker.sock",
+      ]
+    },
+  },
+  networks: {
+    "reverse-proxy": {
+      external: true,
+      name: 'reverse-proxy'
+    },
+    default: {
+      name: "traefik-default"
+    }
+  }
+}
+
+if (JST.getConfiguration('portainer.enabled')) {
+  jstResult.services["portainer"] = {
+    image: 'portainer/portainer-ce',
+    depends_on: ['traefik'],
+    volumes: [
+      '/var/run/docker.sock:/var/run/docker.sock',
+      './portainer:/data',
+    ],
+    command: ["-H", "unix:///var/run/docker.sock"],
+    virtualHosts: [
+      { port: 9000, domain: JST.buildDomain('portainer'), name: 'portainer' }
+    ],
+    environment: {
+      AGENT_SECRET: 'MyP0rtain3rAg3nt'
+    }
+  }
+}
+
+if (JST.getConfiguration('portainer_agent.enabled')) {
+  jstResult.services["portainer-agent"] = {
+    image: 'portainer/agent',
+    volumes: [
+      '/var/lib/docker/volumes:/var/lib/docker/volumes',
+      '/var/run/docker.sock:/var/run/docker.sock',
+    ],
+    ports: ["9001:9001"],
+    environment: {
+      AGENT_SECRET: 'MyP0rtain3rAg3nt'
+    }
+  }
+}
+
+jstResult

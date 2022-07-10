@@ -1,0 +1,56 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+{%- if project.debug %}
+log:
+  level: "DEBUG"
+{%- endif %}
+
+api: {}
+
+providers:
+  docker:
+    exposedByDefault: false
+    network: "reverse-proxy"
+  file:
+    directory: "/config/"
+    watch: true
+
+serversTransport:
+  insecureSkipVerify: true
+
+entryPoints: 
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+
+tls:
+  options:
+    default: 
+      sniStrict: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "{{project.acme_email}}"
+      storage: "acme.json"
+      httpChallenge:
+        entryPoint: "http"
+  {%- if project.cloudflare %}
+  cloudflare:
+    acme:
+      email: "{{project.cloudflare.email}}"
+      storage: acme.json
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+  {% endif %}
+
+{%- if project.pilot %}
+pilot:
+    token: "{{project.pilot}}"
+{%- endif %}

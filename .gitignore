@@ -1,0 +1,9 @@
+
+/traefik/traefik.yaml
+/traefik/acme.json
+/traefik/config
+/traefik/certs
+/docker-compose.yml
+/traefik/config/rivendell.local.darkanakin41.com.yaml
+/pt.local.yaml
+/portainer

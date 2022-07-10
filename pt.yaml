@@ -1,0 +1,15 @@
+# PT Global Configuration
+docker:
+  restart: unless-stopped
+project:
+  name: infrastructure
+reverseProxy:
+  redirectToHttps: false
+  tls: true
+  certResolver: letsencrypt
+  
+# Portainer configuration
+portainer: 
+  enabled: false
+portainer-agent: 
+  enabled: false
