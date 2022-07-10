@@ -7,6 +7,7 @@ const jstResult = {
     traefik: {
       image: 'traefik:latest',
       ports: ["80:80", "443:443"],
+      container_name: 'traefik',
       networks: ['default', 'reverse-proxy'],
       labels: {
         "traefik.enable": true,
@@ -53,7 +54,8 @@ const jstResult = {
   }
 }
 
-if (JST.getConfiguration('portainer.enabled')) {
+if (JST.getConfiguration('portainer.enabled') === "true") {
+  console.log("Portainer enabled")
   jstResult.services["portainer"] = {
     image: 'portainer/portainer-ce',
     depends_on: ['traefik'],
@@ -71,7 +73,8 @@ if (JST.getConfiguration('portainer.enabled')) {
   }
 }
 
-if (JST.getConfiguration('portainer_agent.enabled')) {
+if (JST.getConfiguration('portainer_agent.enabled') === "true") {
+  console.log("Portainer Agent enabled")
   jstResult.services["portainer-agent"] = {
     image: 'portainer/agent',
     volumes: [
@@ -82,6 +85,25 @@ if (JST.getConfiguration('portainer_agent.enabled')) {
     environment: {
       AGENT_SECRET: 'MyP0rtain3rAg3nt'
     }
+  }
+}
+
+if (JST.getConfiguration('traefik_hub_agent.enabled') === "true") {
+  console.log("Traefik Hub Agent enabled")
+  jstResult.services["traefik-hub-agent"] = {
+    image: 'ghcr.io/traefik/hub-agent-traefik:v0.7.2',
+    container_name: 'hub-agent',
+    command: [
+      "run",
+      `--hub.token=${JST.getConfiguration('traefik_hub_agent.token')}`,
+      "--auth-server.advertise-url=http://hub-agent",
+      "--traefik.host=traefik",
+      "--traefik.tls.insecure=true",
+    ],
+    volumes: [
+      '/var/run/docker.sock:/var/run/docker.sock',
+    ],
+    depends_on: ['traefik']
   }
 }
 

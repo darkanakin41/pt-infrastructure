@@ -11,5 +11,7 @@ reverseProxy:
 # Portainer configuration
 portainer: 
   enabled: false
-portainer-agent: 
+portainer_agent: 
+  enabled: false
+traefik_hub_agent: 
   enabled: false

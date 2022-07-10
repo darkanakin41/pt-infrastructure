@@ -54,3 +54,16 @@ certificatesResolvers:
 pilot:
     token: "{{project.pilot}}"
 {%- endif %}
+
+{%- if traefik_hub_agent.enabled %}
+experimental:
+  hub: true
+
+hub:
+  tls:
+    insecure: true
+
+metrics:
+  prometheus:
+    addRoutersLabels: true
+{%- endif %}
