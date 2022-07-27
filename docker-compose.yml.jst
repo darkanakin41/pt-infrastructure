@@ -20,8 +20,6 @@ const jstResult = {
         "traefik.http.routers.traefik-secure.rule": `Host(\`${JST.buildDomain('traefik')}\`)`,
         "traefik.http.routers.traefik-secure.tls": "true",
         "traefik.http.routers.traefik-secure.tls.certresolver": JST.getConfiguration('reverseProxy.certResolver'),
-        "traefik.http.routers.traefik-secure.tls.domains[0].main": `${JST.getConfiguration('reverseProxy.domain.sub')}.${JST.getConfiguration('reverseProxy.domain.ext')}`,
-        "traefik.http.routers.traefik-secure.tls.domains[0].sans": `*.${JST.getConfiguration('reverseProxy.domain.sub')}.${JST.getConfiguration('reverseProxy.domain.ext')}`,
         "traefik.http.routers.traefik-secure.service": "api@internal",
       },
       environment: {
@@ -31,7 +29,6 @@ const jstResult = {
       volumes: [
         "/var/run/docker.sock:/var/run/docker.sock",
         "./traefik/traefik.yaml:/traefik.yaml",
-        "./traefik/acme.json:/acme.json",
         "./traefik/config:/config",
         "./traefik/certs:/certs"
       ]

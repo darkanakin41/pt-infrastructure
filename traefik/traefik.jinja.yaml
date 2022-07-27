@@ -35,14 +35,14 @@ certificatesResolvers:
   letsencrypt:
     acme:
       email: "{{project.acme_email}}"
-      storage: "acme.json"
+      storage: "/certs/letsencrypt.json"
       httpChallenge:
         entryPoint: "http"
   {%- if project.cloudflare %}
   cloudflare:
     acme:
       email: "{{project.cloudflare.email}}"
-      storage: acme.json
+      storage: "/certs/cloudflare.json"
       dnsChallenge:
         provider: cloudflare
         resolvers:

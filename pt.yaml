@@ -6,7 +6,7 @@ project:
 reverseProxy:
   redirectToHttps: false
   tls: true
-  certResolver: letsencrypt
+  certResolver: cloudflare
   
 # Portainer configuration
 portainer: 
