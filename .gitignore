@@ -8,3 +8,8 @@
 /pt.local.yaml
 /portainer
 /traefik/cloudflare.json
+/workdir
+/confdir
+/adguard-home/workdir
+/adguard-home/confdir
+/adguard-home/sync

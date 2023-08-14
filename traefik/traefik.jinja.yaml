@@ -55,6 +55,12 @@ pilot:
     token: "{{project.pilot}}"
 {%- endif %}
 
+{%- if traefik.access_log %}
+accessLog:
+    filePath : "/var/log/traefik/access.log.json"
+    format : "json"
+{%- endif %}
+
 {%- if traefik_hub_agent.enabled %}
 experimental:
   hub: true

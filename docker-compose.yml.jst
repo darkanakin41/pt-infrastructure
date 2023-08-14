@@ -104,4 +104,46 @@ if (JST.getConfiguration('traefik_hub_agent.enabled') === "true") {
   }
 }
 
+if (JST.getConfiguration('adguard.enabled') === "true") {
+  console.log("AdGuard Home enabled")
+  jstResult.services["adguard-home"] = {
+    image: 'adguard/adguardhome',
+    container_name: 'adguard-home',
+    volumes: [
+      './adguard-home/workdir:/opt/adguardhome/work',
+      './adguard-home/confdir:/opt/adguardhome/conf',
+    ],
+    ports: [
+      '53:53/tcp',
+      '53:53/udp',
+      '784:784/udp',
+      '853:853/tcp',
+      '3000:3000/tcp'
+    ],
+    virtualHosts: [
+      { port: 3000, domain: JST.buildDomain('adguard.darkanakin41'), name: 'adguard-home' }
+    ]
+  }
+  
+  if (JST.getConfiguration('adguard.sync') === "true") {
+    console.log("AdGuard Sync enabled")
+    jstResult.services["adguard-home-sync"] = {
+      image: 'linuxserver/adguardhome-sync',
+      init: false,
+      volumes: [
+        './adguard-home/sync:/config',
+      ],
+      environment: {
+        'PUID': '1000',
+        'PGID': '1000',
+        'TZ': 'Europe/Paris',
+        'CONFIGFILE': '/config/adguardhome-sync.yaml',
+      },
+      virtualHosts: [
+        { port: 8080, domain: JST.buildDomain('sync.adguard.darkanakin41'), name: 'adguard-home-sync' }
+      ],
+    }
+  }
+}
+
 jstResult

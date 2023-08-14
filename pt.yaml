@@ -15,3 +15,6 @@ portainer_agent:
   enabled: false
 traefik_hub_agent: 
   enabled: false
+adguard: 
+  enabled: false
+  sync: true
